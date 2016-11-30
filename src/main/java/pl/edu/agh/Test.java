@@ -27,7 +27,7 @@ class DetectFaceDemo {
         // directory.
         CascadeClassifier faceDetector = new CascadeClassifier(new File(xmlPath).getAbsolutePath());
         Mat image = Highgui.imread(new File(pngPath).getAbsolutePath());
-
+        //Mat image = Highgui.imread("/resources/lena.png");
         // Detect faces in the image.
         // MatOfRect is a special container class for Rect.
         MatOfRect faceDetections = new MatOfRect();
