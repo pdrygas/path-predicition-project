@@ -6,3 +6,6 @@ out/
 #gradle
 .gradle/
 
+#video
+*.avi
+
