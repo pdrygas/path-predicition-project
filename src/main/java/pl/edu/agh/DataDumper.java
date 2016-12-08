@@ -19,7 +19,7 @@ public class DataDumper {
 
     public void dump(HashMap<Integer, FoundEntity> entities) {
         for(HashMap.Entry<Integer, FoundEntity> entry : entities.entrySet()) {
-            Point avgPoint = averagePoint(entry.getValue().getfPoints().toArray());
+            Point avgPoint = averagePoint(entry.getValue().getFPoints().toArray());
             writer.println(entry.getKey() + ";" + avgPoint.x + ";" + avgPoint.y);
             writer.flush();
         }
