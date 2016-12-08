@@ -17,65 +17,90 @@ public class Detector {
     private GUI gui;
     private FeaturePointsFinder finder;
     private FeaturePointsTracker tracker;
+    private DataDumper dumper;
     HashMap<Integer,FoundEntity> foundEntities;
 
     public Detector() {
         videoPath = getClass().getResource("/video.avi").getPath();
         xmlPath = getClass().getResource("/haarcascade_fullbody.xml").getPath();
-
+        dumper = new DataDumper("dump.txt");
         scaleFactor = 1.03;
         minNeighbors = 1;
         minSize = new Size(0, 0);
-        maxSize = new Size(0, 0);
+        maxSize = new Size(50, 70);
         finder = new FeaturePointsFinder(10);
         tracker = new FeaturePointsTracker();
         foundEntities = new HashMap<Integer, FoundEntity>();
-
         gui = new GUI();
     }
 
     public void detect() {
         CascadeClassifier classifier = new CascadeClassifier(new File(xmlPath).getAbsolutePath());
         VideoCapture video = new VideoCapture(new File(videoPath).getAbsolutePath());
-        //Mat mat = new Mat();
         Mat prevMat = new Mat();
         boolean detectionNeeded = true;
         boolean trackingEnabled = false;
-        int i =0;
+        int i = 0;
+
         video.read(prevMat);
         while(video.grab()) {
-            i++;
             Mat mat = new Mat();
             video.retrieve(mat);
+
+            /**
+             * Detection every n frames or when all tracked objects get lost
+             */
+            if (i == 30 || foundEntities.size() ==0) {
+                detectionNeeded = true;
+                trackingEnabled = false;
+            }
             if (trackingEnabled) {
-                HashMap<Integer,FoundEntity> newFoundEntities = new HashMap<Integer, FoundEntity>();
+                HashMap<Integer, FoundEntity> updatedEntities = new HashMap<Integer, FoundEntity>();
+                Integer key = 0;
 
                 for(HashMap.Entry<Integer, FoundEntity> entry : foundEntities.entrySet()) {
-                    MatOfPoint2f prevFPoints = entry.getValue().getfPoints();
-                    Rect prevBoundingBox = entry.getValue().getBoundingBox();
+                    /**
+                     * Skipping still entities starts after n frames
+                     */
+                    if (i >= 15) {
+                        if (entry.getValue().getDistanceFromOrigin() <= 1) {
+                            continue;
+                        }
+                    }
+                    /**
+                     * Every n (2) frames new feature points are found in tracking mechanism
+                     */
+                    boolean detectNewFPoints = (i % 2) == 0 ? true : false;
+                    
+                    FoundEntity prevState = entry.getValue();
                     MatOfPoint2f newFPoints = tracker.trackFeaturePoints(
-                            prevMat,mat,prevFPoints);
+                            prevMat,mat,entry.getValue(),finder,detectNewFPoints );
 
-                    if ((i % 19) == 0) {
-                        detectionNeeded = true;
-                        trackingEnabled = false;
-                        break;
-                    } else {
-                        newFoundEntities.put(entry.getKey(),new FoundEntity(prevBoundingBox,newFPoints));
+                    if (newFPoints!= null) {
+                        updatedEntities.put(key, prevState.getNextState(newFPoints));
+                        key++;
                     }
                 }
-                foundEntities = newFoundEntities;
+                foundEntities = updatedEntities;
             }
             if (detectionNeeded) {
                 this.detectNewEntities(classifier,mat);
+
+                /**
+                 * Reseting frames counter and flags
+                 */
                 detectionNeeded = false;
-                trackingEnabled =true;
+                trackingEnabled = true;
+                i = 0;
             }
+
             Mat resizedMat = new Mat();
             drawEntities(mat);
             Imgproc.resize(mat, resizedMat, new Size(1024,768));
             gui.show(resizedMat);
             prevMat = mat;
+            dumper.dump(foundEntities);
+            i++;
         }
     }
 
@@ -104,8 +129,13 @@ public class Detector {
     }
     private void drawEntities(Mat mat) {
         for (FoundEntity entity : foundEntities.values()) {
-            Arrays.stream(entity.getfPoints().toArray()).forEach(
-                    p -> Core.circle(mat, new Point(p.x, p.y),5,new Scalar(200)));
+            Arrays.stream(entity.getFPoints().toArray()).forEach(
+                    p -> {
+                        Core.circle(mat, new Point(p.x, p.y), 5, new Scalar(200));
+                    }
+            );
+            Core.putText(mat,entity.getDistanceFromOrigin()+"",entity.getPosition(),
+                    1,1,new Scalar(4));
         }
     }
 }
