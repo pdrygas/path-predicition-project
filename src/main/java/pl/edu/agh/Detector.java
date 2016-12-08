@@ -16,16 +16,18 @@ public class Detector {
     private GUI gui;
     private FeaturePointsFinder finder;
     private FeaturePointsTracker tracker;
+    private DataDumper dumper;
     HashMap<Integer,FoundEntity> foundEntities;
 
     public Detector() {
         videoPath = getClass().getResource("/video.avi").getPath();
         xmlPath = getClass().getResource("/haarcascade_fullbody.xml").getPath();
+        dumper = new DataDumper("dump.txt");
 
         scaleFactor = 1.03;
         minNeighbors = 1;
         minSize = new Size(0, 0);
-        maxSize = new Size(0, 0);
+        maxSize = new Size(50, 70);
         finder = new FeaturePointsFinder(10);
         tracker = new FeaturePointsTracker();
         foundEntities = new HashMap<Integer, FoundEntity>();
@@ -70,6 +72,7 @@ public class Detector {
             }
 
             drawEntities(mat);
+            dumper.dump(foundEntities);
             gui.show(mat);
         }
     }
