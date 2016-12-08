@@ -2,6 +2,7 @@ package pl.edu.agh;
 
 import org.opencv.core.*;
 import org.opencv.highgui.VideoCapture;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import java.io.File;
 import java.util.Arrays;
@@ -36,14 +37,16 @@ public class Detector {
     public void detect() {
         CascadeClassifier classifier = new CascadeClassifier(new File(xmlPath).getAbsolutePath());
         VideoCapture video = new VideoCapture(new File(videoPath).getAbsolutePath());
-        Mat mat = new Mat();
+        //Mat mat = new Mat();
         Mat prevMat = new Mat();
         boolean detectionNeeded = true;
         boolean trackingEnabled = false;
         int i =0;
-
-        while(video.read(prevMat) && video.read(mat)) {
+        video.read(prevMat);
+        while(video.grab()) {
             i++;
+            Mat mat = new Mat();
+            video.retrieve(mat);
             if (trackingEnabled) {
                 HashMap<Integer,FoundEntity> newFoundEntities = new HashMap<Integer, FoundEntity>();
 
@@ -68,9 +71,11 @@ public class Detector {
                 detectionNeeded = false;
                 trackingEnabled =true;
             }
-
+            Mat resizedMat = new Mat();
             drawEntities(mat);
-            gui.show(mat);
+            Imgproc.resize(mat, resizedMat, new Size(1024,768));
+            gui.show(resizedMat);
+            prevMat = mat;
         }
     }
 
