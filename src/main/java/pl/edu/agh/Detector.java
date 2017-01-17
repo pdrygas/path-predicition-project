@@ -18,6 +18,7 @@ public class Detector {
     private FeaturePointsFinder finder;
     private FeaturePointsTracker tracker;
     private DataDumper dumper;
+    private Rect detectionArea;
     HashMap<Integer,FoundEntity> foundEntities;
 
     public Detector() {
@@ -32,6 +33,7 @@ public class Detector {
         tracker = new FeaturePointsTracker();
         foundEntities = new HashMap<Integer, FoundEntity>();
         gui = new GUI();
+        detectionArea = new Rect(0, 110, 150, 275);
     }
 
     public void detect() {
@@ -46,7 +48,7 @@ public class Detector {
         while(video.grab()) {
             Mat mat = new Mat();
             video.retrieve(mat);
-
+            mat = new Mat(mat, detectionArea);
             /**
              * Detection every n frames or when all tracked objects get lost
              */
@@ -96,8 +98,9 @@ public class Detector {
 
             Mat resizedMat = new Mat();
             drawEntities(mat);
-            Imgproc.resize(mat, resizedMat, new Size(1024,768));
+            Imgproc.resize(mat, resizedMat, new Size(250,600));
             gui.show(resizedMat);
+
             prevMat = mat;
             dumper.dump(foundEntities);
             i++;
