@@ -49,11 +49,9 @@ public class Detector {
         boolean detectionNeeded = true;
         boolean trackingEnabled = false;
         int i = 0;
-        int j = 0;
 
         video.read(prevMat);
         while(video.grab()) {
-            j++;
             Mat mat = new Mat();
             video.retrieve(mat);
             mat = new Mat(mat, detectionArea);
@@ -85,13 +83,12 @@ public class Detector {
 
                     FoundEntity prevState = entry.getValue();
                     MatOfPoint2f newFPoints = tracker.trackFeaturePoints(
-                            prevMat,mat,entry.getValue(),finder,detectNewFPoints);
+                            prevMat,mat,entry.getValue(),finder,false);
 
                     if (newFPoints != null) {
                         updatedEntities.put(currentKey, prevState.getNextState(newFPoints));
-
                     } else {
-                        System.out.println(j + " " + i);
+                        System.out.println(i);
                     }
                 }
                 foundEntities = updatedEntities;

@@ -54,6 +54,7 @@ public class FeaturePointsTracker {
         /**
          * Calculating optical flow and filtering best result points using Forward-Backward Error method
          */
+        if(prevFPoints.toArray().length < 10) return null;
         Video.calcOpticalFlowPyrLK(prevFrameGray, currFrameGray, prevFPoints, newFPoints, results, errors);
         Video.calcOpticalFlowPyrLK(currFrameGray, prevFrameGray, newFPoints, newerFPoints, results1, errors1);
         List<Point> resultList = new ArrayList<>();

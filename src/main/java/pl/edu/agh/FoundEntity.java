@@ -33,7 +33,7 @@ public class FoundEntity {
 
         double xShift = updatedEntity.getPosition().x - this.position.x;
         double yShift = updatedEntity.getPosition().y - this.position.y;
-
+        //if(yShift == 0 && xShift == 0) return null;
         //updatedEntity.shiftBoxByOffset(xShift,yShift);
         updatedEntity.setDistanceFromOrigin(updatedEntity.calcDistFromOrigin());
 //        updatedEntity.setBoundingBox(Imgproc.boundingRect(dst));
