@@ -15,9 +15,9 @@ public class Main {
 //        Detector detector = new Detector(videoFile, dumpFile, detectionArea);
 //        detector.detect();
 
-        HeatMap heatMap = new HeatMap(dumpFile, 40, 80, new Dimension(detectionArea.width, detectionArea.height));
+        HeatMap heatMap = new HeatMap(dumpFile, 10, 20, new Dimension(detectionArea.width, detectionArea.height));
         new Visualizer(dumpFile, new Dimension(220, 320));
-        new Mesh(heatMap, new Dimension(600, 800));
+        new Mesh(heatMap, new Dimension(600, 800), new Simulation(heatMap, 6, 0, Simulation.Direction.SOUTH));
         new VideoSimulation(videoFile, heatMap, detectionArea);
     }
 }
