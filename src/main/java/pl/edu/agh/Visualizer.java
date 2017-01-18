@@ -8,46 +8,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Visualizer {
+public class Visualizer extends Frame {
 
-    private JFrame frame;
     private Canvas canvas;
-    private BufferedReader reader;
 
     public Visualizer(String dumpFile, Dimension size) {
-        createLayout(size);
-        try {
-            FileReader file = new FileReader(getClass().getResource("/").getPath() + dumpFile);
-            reader = new BufferedReader(file);
+        super(size);
 
-            addPointsToCanvas();
-            canvas.drawPoints();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void createLayout(Dimension size) {
-        frame = new JFrame();
-        frame.setLayout(new FlowLayout());
-
+        DumpReader reader = new DumpReader(dumpFile);
         canvas = new Canvas(size);
-        frame.add(canvas);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(size);
-    }
+        canvas.setPoints(reader.getPoints());
+        canvas.drawPoints();
 
-    private void addPointsToCanvas() {
-        String line;
-        try {
-            while((line = reader.readLine()) != null) {
-                String[] values = line.split(";");
-                canvas.addPoint(new Point(new Double(values[1]).intValue(), new Double(values[2]).intValue()));
-            }
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+        super.add(canvas);
     }
 
     private class Canvas extends JPanel {
@@ -58,8 +31,8 @@ public class Visualizer {
             points = new ArrayList<>();
         }
 
-        public void addPoint(Point point) {
-            points.add(point);
+        public void setPoints(ArrayList<Point> points) {
+            this.points = points;
         }
 
         public void drawPoints() {
