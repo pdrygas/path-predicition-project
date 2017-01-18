@@ -25,10 +25,10 @@ public class Detector {
     HashMap<Integer,FoundEntity> foundEntities;
     Integer key;
 
-    public Detector() {
-        videoPath = getClass().getResource("/video.avi").getPath();
+    public Detector(String videoFile, String dumpFile, Rect detectionArea) {
+        videoPath = getClass().getResource("/" + videoFile).getPath();
         xmlPath = getClass().getResource("/haarcascade_fullbody.xml").getPath();
-        dumper = new DataDumper("dump.txt");
+        dumper = new DataDumper(dumpFile);
         scaleFactor = 1.03;
         minNeighbors = 1;
         minSize = new Size(0, 0);
@@ -38,7 +38,7 @@ public class Detector {
         foundEntities = new HashMap<Integer, FoundEntity>();
         key = 0;
         gui = new GUI();
-        detectionArea = new Rect(0, 110, 150, 275);
+        this.detectionArea = detectionArea;
     }
 
     public void detect() {

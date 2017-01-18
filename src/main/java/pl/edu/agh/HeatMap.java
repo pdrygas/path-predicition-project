@@ -1,17 +1,21 @@
 package pl.edu.agh;
 
+import org.opencv.core.Point;
+
 import java.awt.*;
 import java.util.ArrayList;
 
 public class HeatMap {
-    private int xMin, xMax, yMin, yMax;
     private int[][] cells;
-    private ArrayList<Point> points;
+    private double xStep, yStep;
+    private ArrayList<java.awt.Point> points;
 
-    public HeatMap(String dumpFile, int cellsX, int cellsY) {
+    public HeatMap(String dumpFile, int cellsX, int cellsY, Dimension size) {
         DumpReader reader = new DumpReader(dumpFile);
 
         cells = new int[cellsX][cellsY];
+        xStep = (double) size.width / cells.length;
+        yStep = (double) size.height / cells[0].length;
         points = reader.getPoints();
 
         fillCells();
@@ -21,44 +25,32 @@ public class HeatMap {
         return cells;
     }
 
-    private void fillCells() {
-        findExtremes();
-
-        double xSize = (double) (xMax - xMin) / cells.length;
-        double ySize = (double) (yMax - yMin) / cells[0].length;
-        for(Point p : points) {
-            int xPos = (int) Math.round((p.x - xMin) / xSize);
-            int yPos = (int) Math.round((p.y - yMin) / ySize);
-
-            if(xPos >= cells.length) {
-                System.out.println(p.x + " " + xMin + " " + xSize);
-                xPos = cells.length - 1;
-            }
-            if(yPos >= cells[0].length) {
-                yPos = cells[0].length - 1;
-            }
-            cells[xPos][yPos]++;
-        }
+    public double getxStep() {
+        return xStep;
     }
 
-    private void findExtremes() {
-        xMax = -1;
-        yMax = -1;
-        xMin = Integer.MAX_VALUE;
-        yMin = Integer.MAX_VALUE;
-        for(Point p : points) {
-            if(p.x > xMax) {
-                xMax = p.x;
-            }
-            if(p.y > yMax) {
-                yMax = p.y;
-            }
-            if(p.x < xMin) {
-                xMin = p.x;
-            }
-            if(p.y < yMin) {
-                yMin = p.y;
-            }
+    public double getyStep() {
+        return yStep;
+    }
+
+    public Point cellPosition(Point coords) {
+        int xPos = (int) Math.round(coords.x / xStep);
+        int yPos = (int) Math.round(coords.y / yStep);
+
+        if(xPos >= cells.length) {
+            xPos = cells.length - 1;
+        }
+        if(yPos >= cells[0].length) {
+            yPos = cells[0].length - 1;
+        }
+
+        return new Point(xPos, yPos);
+    }
+
+    private void fillCells() {
+        for(java.awt.Point p : points) {
+            Point pos = cellPosition(new Point(p.x, p.y));
+            cells[(int) pos.x][(int) pos.y]++;
         }
     }
 }

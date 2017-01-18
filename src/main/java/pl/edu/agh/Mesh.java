@@ -9,11 +9,8 @@ public class Mesh extends Frame {
 
     private Canvas canvas;
 
-    public Mesh(String dumpFile, Dimension size) {
+    public Mesh(HeatMap heatMap, Dimension size, Simulation sim) {
         super(size);
-
-        HeatMap heatMap = new HeatMap(dumpFile, 40, 80);
-        Simulation sim = new Simulation("dump.txt", 18, 0, Simulation.Direction.SOUTH);
 
         canvas = new Canvas(size);
         super.add(canvas);
@@ -56,7 +53,6 @@ public class Mesh extends Frame {
             drawCells(g, xStep, yStep);
             g.setColor(Color.BLACK);
             drawPath(g, xStep, yStep);
-
         }
 
         private void drawMesh(Graphics g, Dimension size, int xStep, int yStep) {
