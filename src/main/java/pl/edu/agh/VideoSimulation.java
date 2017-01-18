@@ -26,6 +26,7 @@ public class VideoSimulation {
     private GUI gui;
     private HeatMap heatMap;
     private Rect detectionArea;
+    private Size resizedMatSize;
     private ArrayList<java.awt.Point> points;
 
     public VideoSimulation(String videoFile, HeatMap heatMap, Rect detectionArea) {
@@ -33,6 +34,7 @@ public class VideoSimulation {
 
         gui = new GUI();
         points = null;
+        resizedMatSize = new Size(250,600);
 
         this.heatMap = heatMap;
         this.detectionArea = detectionArea;
@@ -40,8 +42,8 @@ public class VideoSimulation {
         gui.addListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Point cellPosition = heatMap.cellPosition(new Point(e.getX()*(detectionArea.width/250.0), e.getY()*(detectionArea.height/600.0)));
-//                System.out.println(cellPosition.x + " " + cellPosition.y);
+                Point cellPosition = heatMap.cellPosition(new Point(e.getX()*((double) detectionArea.width/resizedMatSize.width),
+                                                                    e.getY()*((double) detectionArea.height/resizedMatSize.height)));
                 Simulation sim = new Simulation(heatMap, (int) cellPosition.x, (int) cellPosition.y, Simulation.Direction.SOUTH);
                 points = sim.getPath();
             }
@@ -71,7 +73,7 @@ public class VideoSimulation {
 
             Mat resizedMat = new Mat();
             matToShow = mat;
-            Imgproc.resize(matToShow, resizedMat, new Size(250,600));
+            Imgproc.resize(matToShow, resizedMat, resizedMatSize);
             gui.show(resizedMat);
             try {
                 Thread.sleep(100);
