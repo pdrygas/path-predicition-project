@@ -12,11 +12,12 @@ public class Main {
         Rect detectionArea = new Rect(0, 110, 150, 275);
 
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        Detector detector = new Detector(videoFile, dumpFile, detectionArea);
-        detector.detect();
+//        Detector detector = new Detector(videoFile, dumpFile, detectionArea);
+//        detector.detect();
 
-        HeatMap heatMap = new HeatMap("dump.txt", 40, 80, new Dimension(detectionArea.width, detectionArea.height));
-        new Visualizer("dump.txt", new Dimension(220, 320));
+        HeatMap heatMap = new HeatMap(dumpFile, 40, 80, new Dimension(detectionArea.width, detectionArea.height));
+        new Visualizer(dumpFile, new Dimension(220, 320));
         new Mesh(heatMap, new Dimension(600, 800));
+        new VideoSimulation(videoFile, heatMap, detectionArea);
     }
 }

@@ -4,6 +4,7 @@ import org.opencv.core.Mat;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 
@@ -25,6 +26,10 @@ public class GUI {
         BufferedImage img = matToBufferedImage(mat);
         frame.setSize(img.getWidth(), img.getHeight());
         label.setIcon(new ImageIcon(img));
+    }
+
+    public void addListener(MouseAdapter listener) {
+        frame.addMouseListener(listener);
     }
 
     private BufferedImage matToBufferedImage(Mat mat) {

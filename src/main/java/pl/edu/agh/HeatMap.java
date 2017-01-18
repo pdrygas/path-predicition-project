@@ -1,19 +1,22 @@
 package pl.edu.agh;
 
+import org.opencv.core.Point;
+
 import java.awt.*;
 import java.util.ArrayList;
 
 public class HeatMap {
     private int[][] cells;
-    private ArrayList<Point> points;
-    private Dimension size;
+    private double xStep, yStep;
+    private ArrayList<java.awt.Point> points;
 
     public HeatMap(String dumpFile, int cellsX, int cellsY, Dimension size) {
         DumpReader reader = new DumpReader(dumpFile);
 
         cells = new int[cellsX][cellsY];
+        xStep = (double) size.width / cells.length;
+        yStep = (double) size.height / cells[0].length;
         points = reader.getPoints();
-        this.size = size;
 
         fillCells();
     }
@@ -22,21 +25,32 @@ public class HeatMap {
         return cells;
     }
 
+    public double getxStep() {
+        return xStep;
+    }
+
+    public double getyStep() {
+        return yStep;
+    }
+
+    public Point cellPosition(Point coords) {
+        int xPos = (int) Math.round(coords.x / xStep);
+        int yPos = (int) Math.round(coords.y / yStep);
+
+        if(xPos >= cells.length) {
+            xPos = cells.length - 1;
+        }
+        if(yPos >= cells[0].length) {
+            yPos = cells[0].length - 1;
+        }
+
+        return new Point(xPos, yPos);
+    }
+
     private void fillCells() {
-        double xSize = (double) size.width / cells.length;
-        double ySize = (double) size.height / cells[0].length;
-
-        for(Point p : points) {
-            int xPos = (int) Math.round(p.x / xSize);
-            int yPos = (int) Math.round(p.y / ySize);
-
-            if(xPos >= cells.length) {
-                xPos = cells.length - 1;
-            }
-            if(yPos >= cells[0].length) {
-                yPos = cells[0].length - 1;
-            }
-            cells[xPos][yPos]++;
+        for(java.awt.Point p : points) {
+            Point pos = cellPosition(new Point(p.x, p.y));
+            cells[(int) pos.x][(int) pos.y]++;
         }
     }
 }
