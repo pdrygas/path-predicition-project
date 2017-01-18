@@ -157,8 +157,8 @@ public class Detector {
         for (FoundEntity entity : foundEntities.values()) {
             int bbx = entity.getBoundingBox().x;
             int bby = entity.getBoundingBox().y;
-            int bbw = entity.getBoundingBox().height;
-            int bbh = entity.getBoundingBox().width;
+            int bbh = entity.getBoundingBox().height;
+            int bbw = entity.getBoundingBox().width;
             Core.rectangle(mat, new Point(bbx, bby), new Point(bbx+bbw, bby+bbh), new Scalar(100));
             Core.circle(mat, new Point(entity.getPosition().x, entity.getPosition().y), 5, new Scalar(0,255));
             Arrays.stream(entity.getFPoints().toArray()).forEach(

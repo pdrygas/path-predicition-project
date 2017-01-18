@@ -23,9 +23,9 @@ public class FoundEntity {
     }
 
     public FoundEntity getNextState (MatOfPoint2f newPoints) {
-        MatOfPoint dst = new MatOfPoint();
-        if(newPoints.toList().size() == 0) return null;
-        dst.fromList(newPoints.toList());
+//        MatOfPoint dst = new MatOfPoint();
+//        if(newPoints.toList().size() == 0) return null;
+//        dst.fromList(newPoints.toList());
         //newPoints.convertTo(dst,CvType.CV_32S);
         FoundEntity updatedEntity = this;
         updatedEntity.setFPoints(newPoints);
@@ -36,7 +36,8 @@ public class FoundEntity {
 
         //updatedEntity.shiftBoxByOffset(xShift,yShift);
         updatedEntity.setDistanceFromOrigin(updatedEntity.calcDistFromOrigin());
-        updatedEntity.setBoundingBox(Imgproc.boundingRect(dst));
+//        updatedEntity.setBoundingBox(Imgproc.boundingRect(dst));
+        updatedEntity.setBoundingBox(findBoundingRect(newPoints.toList()));
         return  updatedEntity;
     }
 
@@ -99,5 +100,20 @@ public class FoundEntity {
 
     public void setDistanceFromOrigin(double distanceFromOrigin) {
         this.distanceFromOrigin = distanceFromOrigin;
+    }
+
+    private Rect findBoundingRect(List<Point> points){
+        int mostLeft = 1000;
+        int mostRight = 0;
+        int top = 1000;
+        int bottom = 0;
+
+        for(Point point : points){
+            if (point.x > mostRight) mostRight = (int)point.x;
+            if (point.y > bottom) bottom = (int)point.y;
+            if (point.y < top) top = (int)point.y;
+            if (point.x < mostLeft) mostLeft = (int)point.x;
+        }
+        return new Rect(mostLeft, top, mostRight - mostLeft, bottom - top);
     }
 }
