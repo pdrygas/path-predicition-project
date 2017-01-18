@@ -24,13 +24,14 @@ public class HeatMap {
     private void fillCells() {
         findExtremes();
 
-        int xSize = (xMax - xMin) / cells.length;
-        int ySize = (yMax - yMin) / cells[0].length;
+        double xSize = (double) (xMax - xMin) / cells.length;
+        double ySize = (double) (yMax - yMin) / cells[0].length;
         for(Point p : points) {
-            int xPos = (p.x - xMin) / xSize;
-            int yPos = (p.y - yMin) / ySize;
+            int xPos = (int) Math.round((p.x - xMin) / xSize);
+            int yPos = (int) Math.round((p.y - yMin) / ySize);
 
             if(xPos >= cells.length) {
+                System.out.println(p.x + " " + xMin + " " + xSize);
                 xPos = cells.length - 1;
             }
             if(yPos >= cells[0].length) {
