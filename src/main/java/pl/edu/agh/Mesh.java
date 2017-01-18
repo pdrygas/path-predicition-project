@@ -3,10 +3,6 @@ package pl.edu.agh;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Point;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.SyncFailedException;
 import java.util.ArrayList;
 
 public class Mesh extends Frame {
@@ -16,16 +12,20 @@ public class Mesh extends Frame {
     public Mesh(String dumpFile, Dimension size) {
         super(size);
 
-        HeatMap heatMap = new HeatMap(dumpFile, 20, 40);
-        canvas = new Canvas(size);
-        canvas.setCells(heatMap.getCells());
-        canvas.drawPoints();
+        HeatMap heatMap = new HeatMap(dumpFile, 40, 80);
+        Simulation sim = new Simulation("dump.txt", 18, 0, Simulation.Direction.SOUTH);
 
+        canvas = new Canvas(size);
         super.add(canvas);
+
+        canvas.setCells(heatMap.getCells());
+        canvas.setPositions(sim.getPath());
+        canvas.draw();
     }
 
     private class Canvas extends JPanel {
         private int[][] cells;
+        private ArrayList<Point> positions;
 
         Canvas(Dimension size) {
             setPreferredSize(size);
@@ -35,7 +35,11 @@ public class Mesh extends Frame {
             this.cells = cells;
         }
 
-        public void drawPoints() {
+        public void setPositions(ArrayList<Point> positions) {
+            this.positions = positions;
+        }
+
+        public void draw() {
             repaint();
         }
 
@@ -50,6 +54,9 @@ public class Mesh extends Frame {
             drawMesh(g, size, xStep, yStep);
             g.setColor(Color.RED);
             drawCells(g, xStep, yStep);
+            g.setColor(Color.BLACK);
+            drawPath(g, xStep, yStep);
+
         }
 
         private void drawMesh(Graphics g, Dimension size, int xStep, int yStep) {
@@ -65,9 +72,15 @@ public class Mesh extends Frame {
             for(int i = 0; i < cells.length; i++) {
                 for(int j = 0; j < cells[0].length; j++) {
                     if(cells[i][j] > 0) {
-                        g.drawString(cells[i][j] + "", i * xStep, j * yStep);
+                        g.drawString(cells[i][j] + "", i * xStep, j * yStep + yStep);
                     }
                 }
+            }
+        }
+
+        private void drawPath(Graphics g, int xStep, int yStep) {
+            for(Point p : positions) {
+                g.fillArc(p.x * xStep, p.y * yStep, 6, 6, 0, 360);
             }
         }
     }

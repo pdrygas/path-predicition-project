@@ -17,10 +17,10 @@ public class Visualizer extends Frame {
 
         DumpReader reader = new DumpReader(dumpFile);
         canvas = new Canvas(size);
+        super.add(canvas);
+
         canvas.setPoints(reader.getPoints());
         canvas.drawPoints();
-
-        super.add(canvas);
     }
 
     private class Canvas extends JPanel {

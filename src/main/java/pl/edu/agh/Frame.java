@@ -13,7 +13,7 @@ public class Frame {
 
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        jFrame.setSize(size);
+        jFrame.setSize(new Dimension(size.width + 50, size.height + 50));
     }
 
     public void add(Component comp) {
