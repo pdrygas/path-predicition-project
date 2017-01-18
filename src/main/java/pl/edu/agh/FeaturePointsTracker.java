@@ -24,7 +24,20 @@ public class FeaturePointsTracker {
         MatOfByte results1 = new MatOfByte();
         MatOfFloat errors1 = new MatOfFloat();
         Rect box = entity.getBoundingBox();
+        if(box.x <=0){
+            box = new Rect(1, box.y, box.width + (box.x - 1), box.height);
+        }
+        if(box.y <=0){
+            box = new Rect(box.x, 1, box.width , box.height + (box.y - 1));
+        }
+        if(box.x + box.width >= currFrame.width()){
+            box = new Rect(box.x, box.y, box.width - (box.x + box.width + 1 - currFrame.width()) , box.height);
+        }
+        if(box.y + box.height >= currFrame.height()){
+            box = new Rect(box.x, box.y, box.width, box.height - (box.y + box.height + 1 - currFrame.height()));
+        }
         MatOfPoint2f prevFPoints;
+
 
         if (detectNewFPoints) {
             prevFPoints = finder.findFeaturePoints(new Mat(prevFrame, box), new Point(box.x, box.y));
