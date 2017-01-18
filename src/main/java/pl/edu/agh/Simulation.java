@@ -12,12 +12,11 @@ public class Simulation {
     private Direction direction;
     private int[][] cells;
 
-    public Simulation(String dumpFile, int x, int y, Direction direction) {
+    public Simulation(HeatMap heatMap, int x, int y, Direction direction) {
         this.x = x;
         this.y = y;
         this.direction = direction;
 
-        HeatMap heatMap = new HeatMap(dumpFile, 40, 80);
         cells = heatMap.getCells();
     }
 
