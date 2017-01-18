@@ -31,19 +31,19 @@ public class FoundEntity {
         updatedEntity.setFPoints(newPoints);
         updatedEntity.setPosition(updatedEntity.calcPosition());
 
-        //double xShift = updatedEntity.getPosition().x - this.position.x;
-        //double yShift = updatedEntity.getPosition().y - this.position.y;
+        double xShift = updatedEntity.getPosition().x - this.position.x;
+        double yShift = updatedEntity.getPosition().y - this.position.y;
 
         //updatedEntity.shiftBoxByOffset(xShift,yShift);
         updatedEntity.setDistanceFromOrigin(updatedEntity.calcDistFromOrigin());
 //        updatedEntity.setBoundingBox(Imgproc.boundingRect(dst));
-        updatedEntity.setBoundingBox(findBoundingRect(newPoints.toList()));
+        //updatedEntity.setBoundingBox(findBoundingRect(newPoints.toList()));
+        updatedEntity.setBoundingBox(shiftBoxByOffset(xShift, yShift));
         return  updatedEntity;
     }
 
-    private void shiftBoxByOffset (double dX, double dY) {
-        boundingBox.x += dX;
-        boundingBox.y += dY;
+    private Rect shiftBoxByOffset (double dX, double dY) {
+        return new Rect(boundingBox.x + (int)dX, boundingBox.y + (int)dY, boundingBox.width, boundingBox.height);
     }
 
     private double calcDistFromOrigin() {
@@ -52,6 +52,7 @@ public class FoundEntity {
 
     private Point calcPosition() {
         int avgX = 0, avgY = 0, num = fPoints.toArray().length;
+        if(num == 0) num = 1;
         for (Point p : fPoints.toArray()) {
             avgX += p.x;
             avgY += p.y;

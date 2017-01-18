@@ -49,9 +49,11 @@ public class Detector {
         boolean detectionNeeded = true;
         boolean trackingEnabled = false;
         int i = 0;
+        int j = 0;
 
         video.read(prevMat);
         while(video.grab()) {
+            j++;
             Mat mat = new Mat();
             video.retrieve(mat);
             mat = new Mat(mat, detectionArea);
@@ -83,12 +85,13 @@ public class Detector {
 
                     FoundEntity prevState = entry.getValue();
                     MatOfPoint2f newFPoints = tracker.trackFeaturePoints(
-                            prevMat,mat,entry.getValue(),finder,false);
+                            prevMat,mat,entry.getValue(),finder,detectNewFPoints);
 
                     if (newFPoints != null) {
                         updatedEntities.put(currentKey, prevState.getNextState(newFPoints));
+
                     } else {
-                        System.out.println(i);
+                        System.out.println(j + " " + i);
                     }
                 }
                 foundEntities = updatedEntities;
@@ -172,8 +175,8 @@ public class Detector {
     }
 
     private Rect intersect(Rect r1, Rect r2){
-        int x = min( r1.x, r2.x );
-        int y = min( r1.y, r2.y );
+        int x = max( r1.x, r2.x );
+        int y = max( r1.y, r2.y );
         int width = min(r1.x + r1.width, r2.x + r2.width) - x;
         int height = min(r1.y + r1.height, r2.y + r2.height) - y;
         if (width <= 0 || height <= 0) {
