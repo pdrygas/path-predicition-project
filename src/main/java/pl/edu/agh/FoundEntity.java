@@ -3,6 +3,9 @@ package pl.edu.agh;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Rect;
 import org.opencv.core.*;
+import org.opencv.imgproc.Imgproc;
+
+import java.util.List;
 
 public class FoundEntity {
     private Rect boundingBox;
@@ -20,16 +23,20 @@ public class FoundEntity {
     }
 
     public FoundEntity getNextState (MatOfPoint2f newPoints) {
+        MatOfPoint dst = new MatOfPoint();
+        if(newPoints.toList().size() == 0) return null;
+        dst.fromList(newPoints.toList());
+        //newPoints.convertTo(dst,CvType.CV_32S);
         FoundEntity updatedEntity = this;
         updatedEntity.setFPoints(newPoints);
         updatedEntity.setPosition(updatedEntity.calcPosition());
 
-        double xShift = updatedEntity.getPosition().x - this.position.x;
-        double yShift = updatedEntity.getPosition().y - this.position.y;
+        //double xShift = updatedEntity.getPosition().x - this.position.x;
+        //double yShift = updatedEntity.getPosition().y - this.position.y;
 
-        updatedEntity.shiftBoxByOffset(xShift,yShift);
+        //updatedEntity.shiftBoxByOffset(xShift,yShift);
         updatedEntity.setDistanceFromOrigin(updatedEntity.calcDistFromOrigin());
-
+        updatedEntity.setBoundingBox(Imgproc.boundingRect(dst));
         return  updatedEntity;
     }
 
@@ -44,7 +51,6 @@ public class FoundEntity {
 
     private Point calcPosition() {
         int avgX = 0, avgY = 0, num = fPoints.toArray().length;
-
         for (Point p : fPoints.toArray()) {
             avgX += p.x;
             avgY += p.y;
