@@ -24,7 +24,7 @@ public class Simulation {
         ArrayList<Point> positions = new ArrayList<>();
 
         positions.add(new Point(x, y));
-        while(y >= 0 && y < cells[0].length - 1) {
+        while(y > 0 && y < cells[0].length - 1) {
             if(direction == Direction.SOUTH) {
                 y += 1;
             } else if(direction == Direction.NORTH) {

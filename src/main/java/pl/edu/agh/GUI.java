@@ -14,7 +14,7 @@ public class GUI {
 
     public GUI() {
         frame = new JFrame();
-        frame.setLayout(new FlowLayout());
+        frame.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
         label = new JLabel();
         frame.add(label);
@@ -24,12 +24,12 @@ public class GUI {
 
     public void show(Mat mat) {
         BufferedImage img = matToBufferedImage(mat);
-        frame.setSize(img.getWidth(), img.getHeight());
+        frame.setSize(img.getWidth() + 100, img.getHeight());
         label.setIcon(new ImageIcon(img));
     }
 
-    public void addListener(MouseAdapter listener) {
-        frame.addMouseListener(listener);
+    public void add(Component component) {
+        frame.add(component);
     }
 
     private BufferedImage matToBufferedImage(Mat mat) {
