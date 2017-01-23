@@ -76,7 +76,7 @@ public class Mesh extends Frame {
 
         private void drawPath(Graphics g, int xStep, int yStep) {
             for(Point p : positions) {
-                g.fillArc(p.x * xStep, p.y * yStep, 6, 6, 0, 360);
+                g.fillArc(p.x * xStep, p.y * yStep + yStep/2, 10, 10, 0, 360);
             }
         }
     }

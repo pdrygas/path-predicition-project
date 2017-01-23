@@ -24,19 +24,24 @@ public class Simulation {
         ArrayList<Point> positions = new ArrayList<>();
 
         positions.add(new Point(x, y));
-        while(y > 0 && y < cells[0].length - 1) {
-            if(direction == Direction.SOUTH) {
-                y += 1;
-            } else if(direction == Direction.NORTH) {
-                y -= 1;
-            }
-            nextPosition();
-            positions.add(new Point(x, y));
+        calcAndAddNextPosition(positions);
 
+        while(y > 0 && y < cells[0].length - 1) {
+            calcAndAddNextPosition(positions);
         }
         positions.add(new Point(x, y));
 
         return positions;
+    }
+
+    private void calcAndAddNextPosition(ArrayList<Point> positions) {
+        if(direction == Direction.SOUTH) {
+            y += 1;
+        } else if(direction == Direction.NORTH) {
+            y -= 1;
+        }
+        nextPosition();
+        positions.add(new Point(x, y));
     }
 
     private void nextPosition() {
