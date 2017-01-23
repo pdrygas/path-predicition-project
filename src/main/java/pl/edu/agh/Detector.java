@@ -33,7 +33,7 @@ public class Detector {
         minNeighbors = 1;
         minSize = new Size(0, 0);
         maxSize = new Size(50, 70);
-        finder = new FeaturePointsFinder(10);
+        finder = new FeaturePointsFinder(12);
         tracker = new FeaturePointsTracker();
         foundEntities = new HashMap<Integer, FoundEntity>();
         key = 0;
@@ -60,13 +60,12 @@ public class Detector {
             /**
              * Detection every n frames or when all tracked objects get lost
              */
-            if (i == 30 || foundEntities.size() ==0) {
+            if (i == 50 || foundEntities.size() ==0) {
                 detectionNeeded = true;
                 trackingEnabled = false;
             }
             if (trackingEnabled) {
                 HashMap<Integer, FoundEntity> updatedEntities = new HashMap<Integer, FoundEntity>();
-//                Integer key = 0;
 
                 for(HashMap.Entry<Integer, FoundEntity> entry : foundEntities.entrySet()) {
                     Integer currentKey = entry.getKey();
@@ -81,14 +80,14 @@ public class Detector {
                     /**
                      * Every n (2) frames new feature points are found in tracking mechanism
                      */
-                    boolean detectNewFPoints = (i % 2) == 0;
+                    boolean detectNewFPoints = (i % 5) == 0;
 
                     FoundEntity prevState = entry.getValue();
                     MatOfPoint2f newFPoints = tracker.trackFeaturePoints(
                             prevMat,mat,entry.getValue(),finder,detectNewFPoints);
 
                     if (newFPoints != null) {
-                        updatedEntities.put(currentKey, prevState.getNextState(newFPoints));
+                        updatedEntities.put(currentKey, prevState.getNextState(newFPoints, mat));
 
                     } else {
                         System.out.println(j + " " + i);
@@ -135,25 +134,27 @@ public class Detector {
             Mat cropped = new Mat(mat, rect);
             Boolean isNew = true;
             Integer k = this.key;
+            Point detection = new Point(rect.x + (rect.width/2),rect.y + (rect.height/2));
             /**
              * If rect is overlapping with one of previously tracked entities it will replace its bounding box
              */
             for(HashMap.Entry<Integer, FoundEntity> entry : foundEntities.entrySet()){
-                Rect boundingBox = entry.getValue().getBoundingBox();
-                if((intersect(boundingBox, rect)).area() > 0.5 * rect.area() || (intersect(boundingBox, rect)).area() > 0.5 * boundingBox.area()){
-                    k = entry.getKey();
+                Point oldDetection = entry.getValue().getBoundBoxMiddlePoint();
+                if(Math.hypot(detection.x - oldDetection.x, detection.y - oldDetection.y) < 10){
+                    System.out.println("EEE");
                     isNew = false;
+                    //break;
                 }
             }
-
-            MatOfPoint2f newFPoints = finder.findFeaturePoints(cropped, new Point(rect.x, rect.y));
-            if (newFPoints != null) {
-                this.foundEntities.put(k, new FoundEntity(rect, newFPoints));
-                if(isNew) {
-                    this.key++;
+            if (isNew) {
+                MatOfPoint2f newFPoints = finder.findFeaturePoints(cropped, new Point(rect.x, rect.y));
+                if (newFPoints != null) {
+                    this.foundEntities.put(k, new FoundEntity(rect, newFPoints, mat));
                 }
+                this.key = this.key + 1;
+            } else {
+                continue;
             }
-
         }
     }
     private void drawEntities(Mat mat) {
@@ -175,8 +176,8 @@ public class Detector {
     }
 
     private Rect intersect(Rect r1, Rect r2){
-        int x = max( r1.x, r2.x );
-        int y = max( r1.y, r2.y );
+        int x = min( r1.x, r2.x );
+        int y = min( r1.y, r2.y );
         int width = min(r1.x + r1.width, r2.x + r2.width) - x;
         int height = min(r1.y + r1.height, r2.y + r2.height) - y;
         if (width <= 0 || height <= 0) {

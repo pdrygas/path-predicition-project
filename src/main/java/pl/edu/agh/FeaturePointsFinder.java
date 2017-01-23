@@ -19,7 +19,7 @@ public class FeaturePointsFinder {
          * Calculating raw, relative feature points
          */
         Imgproc.cvtColor(image,grayed,Imgproc.COLOR_BGR2GRAY);
-        Imgproc.goodFeaturesToTrack(grayed,rawFPoints,80,0.25,1);
+        Imgproc.goodFeaturesToTrack(grayed,rawFPoints,40,0.25,0.5);
 
         /**
          * Insufficient number of found feature points results in returning null

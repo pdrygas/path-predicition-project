@@ -4,6 +4,7 @@ import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Rect;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.video.Video;
 
 import java.util.List;
 
@@ -13,32 +14,50 @@ public class FoundEntity {
     private Point position;
     private double distanceFromOrigin;
     private Point detectionPosition;
+    private double EPS = 2;
+    private int MAX_ITER = 50;
+    private Mat currFrame;
 
-    public FoundEntity(Rect rect, MatOfPoint2f points) {
+    public Point getBoundBoxMiddlePoint() {
+        return new Point(boundingBox.x+(boundingBox.width/2), boundingBox.y+(boundingBox.height/2));
+    }
+
+    public Mat getCurrFrame() {
+        return currFrame;
+    }
+
+    public void setCurrFrame(Mat currFrame) {
+        this.currFrame = currFrame;
+    }
+
+    public FoundEntity(Rect rect, MatOfPoint2f points, Mat currFrame) {
         boundingBox = rect;
         fPoints = points;
         position = this.calcPosition();
-        detectionPosition = position;
+        detectionPosition = new Point(rect.x+(rect.width/2), rect.y+(rect.height/2));
         distanceFromOrigin = 0;
+        this.currFrame = currFrame;
     }
 
-    public FoundEntity getNextState (MatOfPoint2f newPoints) {
-//        MatOfPoint dst = new MatOfPoint();
-//        if(newPoints.toList().size() == 0) return null;
-//        dst.fromList(newPoints.toList());
-        //newPoints.convertTo(dst,CvType.CV_32S);
+    public void shiftBoundigBox() {
+        Mat projection = new Mat(new Size(currFrame.width(), currFrame.height()), CvType.CV_8U);
+        projection.setTo(new Scalar(0));
+        for (Point p : fPoints.toArray()) {
+            Core.circle(projection, p, 1, new Scalar(255));
+        }
+        Core.rectangle(projection, new Point(boundingBox.x, boundingBox.y),
+                new Point(boundingBox.x + boundingBox.width, boundingBox.y+boundingBox.height), new Scalar(0));
+        TermCriteria termCriteria = new TermCriteria(TermCriteria.COUNT+TermCriteria.EPS,MAX_ITER,EPS);
+        Video.meanShift(projection, boundingBox, termCriteria);
+    }
+
+    public FoundEntity getNextState (MatOfPoint2f newPoints, Mat currFrame) {
         FoundEntity updatedEntity = this;
         updatedEntity.setFPoints(newPoints);
         updatedEntity.setPosition(updatedEntity.calcPosition());
-
-        double xShift = updatedEntity.getPosition().x - this.position.x;
-        double yShift = updatedEntity.getPosition().y - this.position.y;
-
-        //updatedEntity.shiftBoxByOffset(xShift,yShift);
         updatedEntity.setDistanceFromOrigin(updatedEntity.calcDistFromOrigin());
-//        updatedEntity.setBoundingBox(Imgproc.boundingRect(dst));
-        //updatedEntity.setBoundingBox(findBoundingRect(newPoints.toList()));
-        updatedEntity.setBoundingBox(shiftBoxByOffset(xShift, yShift));
+        updatedEntity.setCurrFrame(currFrame);
+        updatedEntity.shiftBoundigBox();
         return  updatedEntity;
     }
 

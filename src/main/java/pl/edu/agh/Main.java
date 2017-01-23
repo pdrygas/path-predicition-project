@@ -12,8 +12,8 @@ public class Main {
         Rect detectionArea = new Rect(0, 110, 150, 275);
 
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-//        Detector detector = new Detector(videoFile, dumpFile, detectionArea);
-//        detector.detect();
+        Detector detector = new Detector(videoFile, dumpFile, detectionArea);
+        detector.detect();
 
         HeatMap heatMap = new HeatMap(dumpFile, 10, 20, new Dimension(detectionArea.width, detectionArea.height));
         new Visualizer(dumpFile, new Dimension(220, 320));
